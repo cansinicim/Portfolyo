@@ -15,6 +15,8 @@ const navItems = [
   { to: '/admin/experience', icon: Briefcase, label: 'Experience' },
 ];
 
+const apiHost = new URL(import.meta.env.VITE_API_URL || 'http://localhost:5001/api').host;
+
 export default function AdminLayout({ children }) {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
@@ -99,7 +101,7 @@ export default function AdminLayout({ children }) {
           </button>
           <div className="flex-1" />
           <div className="text-xs text-zinc-600 font-mono">
-            localhost:5001
+            {apiHost}
           </div>
           <div className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]" />
         </header>
