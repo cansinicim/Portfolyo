@@ -1,0 +1,13 @@
+const mongoose = require('mongoose');
+
+const contactSchema = new mongoose.Schema(
+  {
+    email: { type: String, trim: true },
+    phone: { type: String, trim: true },
+    address: { type: String, trim: true },
+    mapUrl: { type: String, trim: true },
+  },
+  { timestamps: true }
+);
+
+module.exports = mongoose.model('Contact', contactSchema);

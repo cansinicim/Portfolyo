@@ -1,0 +1,49 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: portfolyo_app
+    restart: unless-stopped
+    ports:
+      - "${HOST_PORT:-5001}:5000"
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: 5000
+      MONGO_URI: mongodb://mongo:27017/${MONGO_DB:-portfolyo}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRE: ${JWT_EXPIRE:-7d}
+    volumes:
+      - uploads_data:/app/uploads
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      - portfolyo_net
+
+  mongo:
+    image: mongo:7-jammy
+    container_name: portfolyo_mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-portfolyo}
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - portfolyo_net
+
+volumes:
+  mongo_data:
+  uploads_data:
+
+networks:
+  portfolyo_net:
+    driver: bridge
