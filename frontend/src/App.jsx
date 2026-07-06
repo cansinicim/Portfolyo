@@ -3,10 +3,9 @@ import Navbar from './components/Navbar.jsx';
 import Hero from './components/Hero.jsx';
 import About from './components/About.jsx';
 import Projects from './components/Projects.jsx';
-import Skills from './components/Skills.jsx';
 import Contact from './components/Contact.jsx';
 import Footer from './components/Footer.jsx';
-import AuroraBackground from './components/AuroraBackground.jsx';
+import ShaderBackground from './components/ShaderBackground.jsx';
 import { usePortfolioData } from './hooks/usePortfolioData.js';
 
 function ScrollProgress() {
@@ -25,21 +24,21 @@ function ScrollProgress() {
 }
 
 export default function App() {
-  const { profile, skills, projects, socials, loading } = usePortfolioData();
+  const { profile, skills, projects, socials, experience, loading } = usePortfolioData();
+  const viewSourceUrl = socials.find((s) => s.platform?.toLowerCase() === 'github' || s.icon?.toLowerCase() === 'github')?.url;
 
   return (
     <>
-      <AuroraBackground />
+      <ShaderBackground />
       <ScrollProgress />
       <Navbar profile={profile} />
       <main>
-        <Hero profile={profile} />
-        <About profile={profile} skills={skills} />
-        <Projects projects={projects} loading={loading} />
-        <Skills skills={skills} />
-        <Contact profile={profile} socials={socials} />
+        <Hero profile={profile} viewSourceUrl={viewSourceUrl} />
+        <About profile={profile} skills={skills} experience={experience} />
+        <Projects projects={projects} loading={loading} viewSourceUrl={viewSourceUrl} />
+        <Contact profile={profile} />
       </main>
-      <Footer profile={profile} />
+      <Footer profile={profile} socials={socials} />
     </>
   );
 }

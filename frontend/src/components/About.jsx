@@ -1,5 +1,12 @@
 import { motion } from 'framer-motion';
-import { MapPin, Mail } from 'lucide-react';
+import { User } from 'lucide-react';
+
+const categoryLabels = {
+  frontend: 'FRONTEND',
+  backend: 'BACKEND',
+  devops: 'DEVOPS',
+  other: 'OTHER',
+};
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -8,122 +15,115 @@ const fadeUp = {
 
 const stagger = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.05 } },
+  show: { transition: { staggerChildren: 0.1 } },
 };
 
-const tagItem = {
-  hidden: { opacity: 0, y: 10, scale: 0.9 },
-  show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.35 } },
-};
+const formatDate = (d) => new Date(d).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 
-export default function About({ profile, skills }) {
-  const stackPreview = skills.slice(0, 12);
+export default function About({ profile, skills, experience }) {
+  const grouped = skills.reduce((acc, skill) => {
+    (acc[skill.category] ||= []).push(skill);
+    return acc;
+  }, {});
+  const categories = Object.keys(categoryLabels).filter((c) => grouped[c]?.length);
 
   return (
-    <section id="about" className="py-28 px-6 relative overflow-hidden">
-      <div className="max-w-6xl mx-auto relative z-10">
-        {/* Section label */}
-        <motion.div
-          initial={{ opacity: 0, x: -16 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true, amount: 0.6 }}
-          transition={{ duration: 0.5 }}
-          className="flex items-center gap-3 mb-4"
-        >
-          <span className="text-xs font-semibold text-violet-400 tracking-widest uppercase">About</span>
-          <div className="h-px flex-1 bg-gradient-to-r from-violet-500/30 to-transparent max-w-24" />
-        </motion.div>
+    <section className="py-24 px-margin-mobile md:px-margin-desktop max-w-max-width mx-auto" id="about">
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.6 }}
+      >
+        <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-primary mb-12 flex items-center gap-4">
+          <span className="text-primary-container font-mono">[01]</span> System Logs
+        </h2>
 
-        <div className="grid lg:grid-cols-2 gap-16 items-start">
-          {/* Left: text */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           <motion.div
             variants={stagger}
             initial="hidden"
             whileInView="show"
-            viewport={{ once: true, amount: 0.3 }}
+            viewport={{ once: true, amount: 0.2 }}
+            className="space-y-6"
           >
-            <motion.h2 variants={fadeUp} className="text-4xl sm:text-5xl font-bold tracking-tight mb-6 gradient-text leading-tight">
-              Crafting software<br />with intention.
-            </motion.h2>
-            <motion.p variants={fadeUp} className="text-zinc-400 text-base leading-relaxed mb-8">
-              {profile?.about || 'Add an "about" section from the admin panel.'}
-            </motion.p>
+            {profile?.about && (
+              <motion.div variants={fadeUp} className="glass-panel p-6 border-l-4 border-l-primary-container">
+                <p className="font-mono text-primary mb-2 text-xs tracking-[0.1em] uppercase">LOG_INIT: BACKSTORY</p>
+                <p className="text-on-surface-variant">{profile.about}</p>
+              </motion.div>
+            )}
 
-            {/* Meta info */}
-            {(profile?.location || profile?.email) && (
-              <motion.div variants={fadeUp} className="flex flex-wrap gap-4">
-                {profile?.location && (
-                  <div className="inline-flex items-center gap-2 text-sm text-zinc-400">
-                    <MapPin size={14} className="text-violet-400" />
-                    {profile.location}
-                  </div>
-                )}
-                {profile?.email && (
-                  <div className="inline-flex items-center gap-2 text-sm text-zinc-400">
-                    <Mail size={14} className="text-cyan-400" />
-                    {profile.email}
-                  </div>
-                )}
+            {categories.length > 0 && (
+              <motion.div variants={fadeUp} className="glass-panel p-6 border-l-4 border-l-secondary">
+                <p className="font-mono text-primary mb-3 text-xs tracking-[0.1em] uppercase">LOG_STATUS: CURRENT_STACK</p>
+                <div className="space-y-3">
+                  {categories.map((cat) => (
+                    <div key={cat}>
+                      <p className="font-mono text-[10px] text-on-surface-variant opacity-50 mb-1.5">// {categoryLabels[cat]}</p>
+                      <div className="flex flex-wrap gap-2">
+                        {grouped[cat].map((skill) => (
+                          <span key={skill._id} className="bg-surface-container px-3 py-1 text-xs font-mono border border-outline-variant/30 text-on-surface">
+                            {skill.name}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
+            {experience.length > 0 && (
+              <motion.div variants={fadeUp} className="glass-panel p-6 border-l-4 border-l-primary-container">
+                <p className="font-mono text-primary mb-3 text-xs tracking-[0.1em] uppercase">LOG_HISTORY: CAREER_PATH</p>
+                <div className="space-y-4">
+                  {experience.map((exp) => (
+                    <div key={exp._id} className="font-mono text-xs">
+                      <p className="text-on-surface">
+                        <span className="text-primary-container">$</span> {exp.position} <span className="text-on-surface-variant opacity-60">@ {exp.company}</span>
+                      </p>
+                      <p className="text-on-surface-variant opacity-50 mt-0.5">
+                        {formatDate(exp.startDate)} - {exp.endDate ? formatDate(exp.endDate) : 'Present'}
+                      </p>
+                      {exp.description && (
+                        <p className="text-on-surface-variant mt-1.5 font-sans">{exp.description}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </motion.div>
             )}
           </motion.div>
 
-          {/* Right: tech stack grid */}
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.6 }}
+            className="relative group"
           >
-            <p className="text-xs font-semibold text-zinc-500 tracking-widest uppercase mb-4">
-              Technologies I work with
-            </p>
-            {stackPreview.length === 0 ? (
-              <p className="text-sm text-zinc-600">No skills added yet.</p>
-            ) : (
-              <motion.div
-                variants={stagger}
-                initial="hidden"
-                whileInView="show"
-                viewport={{ once: true, amount: 0.3 }}
-                className="flex flex-wrap gap-2"
-              >
-                {stackPreview.map((skill) => (
-                  <motion.span key={skill._id} variants={tagItem} className="tech-tag">
-                    {skill.name}
-                  </motion.span>
-                ))}
-              </motion.div>
-            )}
-
-            {/* Values / what I do */}
-            <motion.div
-              variants={stagger}
-              initial="hidden"
-              whileInView="show"
-              viewport={{ once: true, amount: 0.2 }}
-              className="mt-8 grid grid-cols-2 gap-3"
-            >
-              {[
-                { title: 'Clean Code', desc: 'Readable, maintainable, and well-structured.' },
-                { title: 'Performance', desc: 'Fast by default, optimized where it matters.' },
-                { title: 'UI/UX Focus', desc: 'Interfaces that feel intuitive and polished.' },
-                { title: 'Open Source', desc: 'Give back to the community that built me.' },
-              ].map((item) => (
-                <motion.div
-                  key={item.title}
-                  variants={tagItem}
-                  whileHover={{ y: -3 }}
-                  className="glass rounded-xl p-4 transition-colors hover:border-white/15"
-                >
-                  <div className="text-sm font-semibold text-white mb-1">{item.title}</div>
-                  <div className="text-xs text-zinc-500 leading-relaxed">{item.desc}</div>
-                </motion.div>
-              ))}
-            </motion.div>
+            <div className="absolute -inset-4 bg-primary-container/10 blur-xl group-hover:bg-primary-container/20 transition-all duration-700 rounded-full" />
+            <div className="relative aspect-square overflow-hidden rounded-lg border border-outline-variant/30">
+              {profile?.profileImage ? (
+                <img
+                  src={profile.profileImage}
+                  alt={profile.fullName}
+                  className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-surface-container-high">
+                  <User size={64} className="text-outline-variant" />
+                </div>
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
+              <div className="absolute bottom-6 left-6 font-mono text-xs text-primary-container bg-background/80 px-4 py-2 backdrop-blur-md border border-primary-container/50">
+                ID_0492: HUMAN_INTERFACE_UNIT
+              </div>
+            </div>
           </motion.div>
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 }

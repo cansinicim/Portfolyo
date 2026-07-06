@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ArrowRight, Download, ChevronDown } from 'lucide-react';
+import { Terminal, ChevronsDown } from 'lucide-react';
 
 const container = {
   hidden: {},
@@ -7,113 +7,89 @@ const container = {
 };
 
 const item = {
-  hidden: { opacity: 0, y: 24 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] } },
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } },
 };
 
-export default function Hero({ profile }) {
-  const name = profile?.fullName || 'Your Name';
+export default function Hero({ profile, viewSourceUrl }) {
+  const name = profile?.fullName || 'guest';
   const title = profile?.title || 'Add your title from the admin panel';
 
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
-      {/* Focal glow behind the name */}
+    <header className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
       <motion.div
-        className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[650px] rounded-full pointer-events-none"
-        style={{
-          background: 'radial-gradient(circle, rgba(139,92,246,0.32) 0%, rgba(34,211,238,0.16) 45%, transparent 70%)',
-          filter: 'blur(50px)',
-        }}
-        animate={{ scale: [1, 1.08, 1], opacity: [0.85, 1, 0.85] }}
-        transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-      />
-
-      {/* Content */}
-      <motion.div
-        className="relative z-10 max-w-4xl mx-auto px-6 text-center"
+        className="relative z-20 w-full max-w-3xl px-margin-mobile"
         variants={container}
         initial="hidden"
         animate="show"
       >
-        {/* Avatar */}
-        {profile?.profileImage && (
-          <motion.div variants={item} className="flex justify-center mb-6">
-            <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full p-[3px] bg-gradient-to-br from-violet-500 via-indigo-500 to-cyan-400">
-              <img
-                src={profile.profileImage}
-                alt={name}
-                className="w-full h-full rounded-full object-cover border-2 border-[#050507]"
-              />
+        <motion.div variants={item} className="glass-panel rounded-lg overflow-hidden shadow-2xl border border-outline-variant/50 relative">
+          <div className="terminal-header flex items-center justify-between px-4 py-2">
+            <div className="flex space-x-2">
+              <div className="w-3 h-3 rounded-full bg-red-500/50" />
+              <div className="w-3 h-3 rounded-full bg-yellow-500/50" />
+              <div className="w-3 h-3 rounded-full bg-green-500/50" />
             </div>
+            <div className="font-mono text-xs text-on-surface-variant opacity-60">guest@terminal-dev: ~</div>
+          </div>
+
+          <div className="p-8 font-mono text-sm">
+            <div className="mb-4">
+              <span className="text-primary-container">sudo</span>{' '}
+              <span className="text-secondary">guest:</span>
+              <span className="text-on-surface">~$ whoami</span>
+            </div>
+            <div className="mb-6 text-on-surface-variant">
+              &gt; <span className="text-primary blinking-cursor">{name}</span>
+            </div>
+
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight leading-[1.1] text-primary mb-6">
+              {title}
+            </h1>
+
+            {profile?.about && (
+              <div className="mb-8 text-on-surface-variant max-w-xl">
+                {profile.about}
+              </div>
+            )}
+
+            <div className="flex flex-col sm:flex-row gap-4">
+              <motion.a
+                href="#work"
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                className="bg-primary-container text-on-primary-container px-8 py-4 font-mono text-xs tracking-[0.1em] uppercase font-bold glow-hover transition-all flex items-center justify-center gap-2"
+              >
+                <Terminal size={16} />
+                Execute_Journey
+              </motion.a>
+              {viewSourceUrl && (
+                <motion.a
+                  href={viewSourceUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="border border-primary-container text-primary-container px-8 py-4 font-mono text-xs tracking-[0.1em] uppercase font-bold hover:bg-primary-container/10 transition-all flex items-center justify-center gap-2"
+                >
+                  View_Source
+                </motion.a>
+              )}
+            </div>
+          </div>
+
+          <div className="scanline" />
+        </motion.div>
+
+        <motion.div variants={item} className="mt-8 flex justify-center opacity-50">
+          <motion.div
+            animate={{ y: [0, 8, 0] }}
+            transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+          >
+            <ChevronsDown className="text-primary-container" size={22} />
           </motion.div>
-        )}
-
-        {/* Name */}
-        <motion.h1
-          variants={item}
-          className="text-5xl sm:text-7xl md:text-8xl font-black tracking-tight leading-none mb-4"
-        >
-          <span className="name-gradient">{name}</span>
-        </motion.h1>
-
-        {/* Title */}
-        <motion.p
-          variants={item}
-          className="text-xl sm:text-2xl md:text-3xl font-semibold mb-5"
-        >
-          <span className="accent-text">{title}</span>
-        </motion.p>
-
-        {/* Tagline */}
-        {profile?.about && (
-          <motion.p
-            variants={item}
-            className="text-base sm:text-lg text-zinc-400 max-w-xl mx-auto leading-relaxed mb-10"
-          >
-            {profile.about}
-          </motion.p>
-        )}
-
-        {/* CTA Buttons */}
-        <motion.div
-          variants={item}
-          className="flex flex-col sm:flex-row items-center justify-center gap-3"
-        >
-          <motion.a
-            href="#projects"
-            whileHover={{ scale: 1.04, y: -2 }}
-            whileTap={{ scale: 0.97 }}
-            className="group inline-flex items-center gap-2 px-7 py-3.5 rounded-xl font-semibold text-sm text-white bg-gradient-to-r from-violet-500 via-indigo-500 to-cyan-500 bg-[length:200%_100%] hover:bg-right btn-glow transition-[background-position] duration-500"
-          >
-            View Projects
-            <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-          </motion.a>
-          {profile?.cvUrl && (
-            <motion.a
-              href={profile.cvUrl}
-              download
-              target="_blank"
-              rel="noreferrer"
-              whileHover={{ scale: 1.04, y: -2 }}
-              whileTap={{ scale: 0.97 }}
-              className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl font-semibold text-sm text-zinc-300 glass hover:text-white hover:border-white/20 hover:bg-white/[0.06] transition-colors"
-            >
-              <Download size={15} />
-              Resume
-            </motion.a>
-          )}
         </motion.div>
       </motion.div>
-
-      {/* Scroll indicator */}
-      <motion.div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-40"
-        animate={{ y: [0, 8, 0] }}
-        transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
-      >
-        <span className="text-xs text-zinc-500 tracking-widest uppercase">Scroll</span>
-        <ChevronDown size={16} className="text-zinc-500" />
-      </motion.div>
-    </section>
+    </header>
   );
 }
